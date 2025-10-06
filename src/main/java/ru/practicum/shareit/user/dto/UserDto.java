@@ -1,14 +1,14 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.dto;
 
-public class User {
+public class UserDto {
     private Long id;
     private String name;
     private String email;
 
-    public User() {
+    public UserDto() {
     }
 
-    public User(Long id, String name, String email) {
+    public UserDto(Long id, String name, String email) {
         this.id = id;
         this.name = name;
         this.email = email;
