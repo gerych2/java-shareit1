@@ -16,12 +16,10 @@ public class ItemServiceImpl implements ItemService {
     
     @Override
     public ItemDto createItem(ItemDto itemDto, Long ownerId) {
-        validateItem(itemDto);
-        
         Item item = ItemMapper.toItem(itemDto, ownerId);
         item.setId(nextId++);
         items.put(item.getId(), item);
-        return ItemMapper.toItemDto(item);
+        return ItemMapper.toDto(item);
     }
     
     @Override
@@ -36,22 +34,16 @@ public class ItemServiceImpl implements ItemService {
         }
         
         if (itemDto.getName() != null) {
-            if (itemDto.getName().trim().isEmpty()) {
-                throw new IllegalArgumentException("Название не может быть пустым");
-            }
             existingItem.setName(itemDto.getName());
         }
         if (itemDto.getDescription() != null) {
-            if (itemDto.getDescription().trim().isEmpty()) {
-                throw new IllegalArgumentException("Описание не может быть пустым");
-            }
             existingItem.setDescription(itemDto.getDescription());
         }
         if (itemDto.getAvailable() != null) {
             existingItem.setAvailable(itemDto.getAvailable());
         }
         
-        return ItemMapper.toItemDto(existingItem);
+        return ItemMapper.toDto(existingItem);
     }
     
     @Override
@@ -60,15 +52,14 @@ public class ItemServiceImpl implements ItemService {
         if (item == null) {
             throw new NoSuchElementException("Вещь с ID " + itemId + " не найдена");
         }
-        return ItemMapper.toItemDto(item);
+        return ItemMapper.toDto(item);
     }
     
     @Override
     public List<ItemDto> getItemsByOwner(Long ownerId) {
-        return items.values().stream()
+        return ItemMapper.toDto(items.values().stream()
                 .filter(item -> item.getOwnerId().equals(ownerId))
-                .map(ItemMapper::toItemDto)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
     
     @Override
@@ -78,23 +69,10 @@ public class ItemServiceImpl implements ItemService {
         }
         
         String searchText = text.toLowerCase();
-        return items.values().stream()
+        return ItemMapper.toDto(items.values().stream()
                 .filter(item -> item.getAvailable() != null && item.getAvailable())
                 .filter(item -> (item.getName() != null && item.getName().toLowerCase().contains(searchText)) ||
                                (item.getDescription() != null && item.getDescription().toLowerCase().contains(searchText)))
-                .map(ItemMapper::toItemDto)
-                .collect(Collectors.toList());
-    }
-    
-    private void validateItem(ItemDto itemDto) {
-        if (itemDto.getName() == null || itemDto.getName().trim().isEmpty()) {
-            throw new IllegalArgumentException("Название не может быть пустым");
-        }
-        if (itemDto.getDescription() == null || itemDto.getDescription().trim().isEmpty()) {
-            throw new IllegalArgumentException("Описание не может быть пустым");
-        }
-        if (itemDto.getAvailable() == null) {
-            throw new IllegalArgumentException("Поле available обязательно");
-        }
+                .collect(Collectors.toList()));
     }
 }
